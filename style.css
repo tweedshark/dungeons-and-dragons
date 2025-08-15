@@ -1,0 +1,26 @@
+body {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://t3.ftcdn.net/jpg/05/54/24/36/360_F_554243606_iZ0fdePp7AX3M732Lmv0qhGA2N73leBY.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    margin: 0;
+    color: #fff;
+    font-family: 'MedievalSharp', cursive;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+h1 {
+    font-size: 5rem; /* Increased size for impact */
+    color: #f0f;
+    text-shadow: 0 0 7px #f0f, 0 0 10px #f0f, 0 0 21px #f0f, 0 0 42px #f0f, 0 0 82px #f0f, 0 0 92px #f0f;
+}
+
+p {
+    font-size: 2rem; /* Increased size for impact */
+    color: #0ff;
+    text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 15px #0ff, 0 0 20px #0ff;
+}

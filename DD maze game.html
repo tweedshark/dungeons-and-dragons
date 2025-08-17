@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon D&D Maze Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #1a1a2e; /* Dark background */
+            color: #00f0ff; /* Neon blue */
+            font-family: 'Press Start 2P', cursive;
+            margin: 0;
+            overflow: hidden; /* Prevent scrollbars */
+        }
+        #game-container {
+            border: 5px solid #ff00ff; /* Neon pink border */
+            box-shadow: 0 0 20px #ff00ff, 0 0 30px #00f0ff; /* Glow effect */
+            background-color: #0d0d1a; /* Even darker background for game area */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            border-radius: 15px;
+            position: relative;
+        }
+        canvas {
+            background-color: #0a0a14; /* Maze background */
+            display: block;
+            border-radius: 10px;
+        }
+        #game-info {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding: 10px 0;
+            font-size: 1.2em;
+        }
+        #messages {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff00ff;
+            font-size: 2em;
+            text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+            text-align: center;
+            display: none; /* Hidden by default */
+            z-index: 10;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #00f0ff;
+        }
+        button {
+            background-color: #00f0ff; /* Neon blue button */
+            color: #1a1a2e;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 15px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2em;
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+            transition: all 0.2s ease-in-out;
+            display: none; /* Hidden by default */
+        }
+        button:hover {
+            background-color: #ff00ff; /* Neon pink on hover */
+            box-shadow: 0 0 15px #ff00ff, 0 0 25px #ff00ff;
+            transform: scale(1.05);
+        }
+        /* Fireworks styling */
+        .firework {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background-color: white;
+            border-radius: 50%;
+            opacity: 0;
+            animation: firework-explode 1s forwards;
+        }
+
+        @keyframes firework-explode {
+            0% { transform: scale(0); opacity: 1; }
+            50% { opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="game-info">
+            <div id="score">Score: 0</div>
+            <div id="level">Level: 1</div>
+            <div id="lives">Lives: 3</div>
+        </div>
+        <canvas id="gameCanvas"></canvas>
+        <div id="messages"></div>
+        <button id="restartButton">Restart Game</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('score');
+        const levelDisplay = document.getElementById('level');
+        const livesDisplay = document.getElementById('lives'); // New element for lives
+        const messagesDisplay = document.getElementById('messages');
+        const restartButton = document.getElementById('restartButton');
+
+        let tileSize = 40; // Size of each maze cell
+        let mazeWidth = 15;
+        let mazeHeight = 10;
+        canvas.width = mazeWidth * tileSize;
+        canvas.height = mazeHeight * tileSize;
+
+        let player = { x: 0, y: 0, character: '🛡️' }; // Knight emoji
+        let startPoint = { x: 0, y: 0 }; // To store the original start point for respawning
+        let exit = { x: 0, y: 0 };
+        let score = 0;
+        let currentLevel = 1;
+        let lives = 3; // Initial lives
+        let gameRunning = false;
+        let gameOver = false;
+        let animationFrameId;
+
+        // Colors for maze walls, cycling through levels
+        const wallColors = [
+            '#00f0ff', // Neon Blue for Level 1
+            '#ff00ff', // Neon Pink for Level 2
+            '#00ff00', // Neon Green for Level 3
+            '#ffff00', // Neon Yellow for Level 4
+            '#ff8000'  // Neon Orange for Level 5
+        ];
+
+        // Pre-defined mazes for 5 levels (0 = path, 1 = wall, 2 = start, 3 = end)
+        // These mazes are designed to have multiple paths and some complexity.
+        const mazes = [
+            // Level 1: Simple introduction
+            [
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,2,0,0,0,0,0,1,0,0,0,0,0,3,1],
+                [1,1,1,1,1,1,0,1,0,1,1,1,0,1,1],
+                [1,0,0,0,0,0,0,1,0,1,0,0,0,1,1],
+                [1,0,1,1,1,1,0,1,0,1,0,1,1,1,1],
+                [1,0,0,0,0,1,0,0,0,1,0,0,0,0,1],
+                [1,1,1,1,0,1,1,1,0,1,1,1,0,1,1],
+                [1,0,0,0,0,0,0,0,0,0,0,1,0,0,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+            ],
+            // Level 2: Slightly more complex, longer paths
+            [
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,2,0,1,0,0,0,0,0,0,1,0,0,0,1],
+                [1,1,0,1,0,1,1,1,1,0,1,0,1,0,1],
+                [1,0,0,0,0,1,0,0,0,0,0,0,1,0,1],
+                [1,0,1,1,1,1,0,1,1,1,1,0,1,0,1],
+                [1,0,0,0,0,0,0,1,0,0,0,0,1,0,1],
+                [1,1,1,1,1,1,0,1,0,1,1,1,1,0,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,3,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+            ],
+            // Level 3: More open, but with tricky dragon paths
+            [
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,2,0,0,0,0,1,0,0,0,0,0,0,0,1],
+                [1,1,1,0,1,0,1,0,1,1,1,1,0,1,1],
+                [1,0,0,0,1,0,1,0,0,0,0,1,0,0,1],
+                [1,0,1,1,1,0,1,1,1,1,0,1,1,0,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,1,0,1],
+                [1,1,1,1,1,0,1,1,1,0,1,1,1,0,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,3,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+            ],
+            // Level 4: Intricate paths, more obstacles
+            [
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,2,0,1,0,0,0,0,1,0,0,0,0,0,1],
+                [1,1,0,1,0,1,1,0,1,0,1,1,1,0,1],
+                [1,0,0,0,0,1,0,0,1,0,0,0,1,0,1],
+                [1,0,1,1,1,1,0,1,1,1,1,0,1,0,1],
+                [1,0,0,0,0,0,0,1,0,0,0,0,1,0,1],
+                [1,1,1,1,0,1,1,1,0,1,1,1,1,0,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,3,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+            ],
+            // Level 5: Final challenge, multiple dragons, more complex movement
+            [
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,2,0,0,1,0,0,0,0,1,0,0,0,0,1],
+                [1,1,1,0,1,0,1,1,0,1,0,1,1,0,1],
+                [1,0,0,0,0,0,1,0,0,1,0,0,1,0,1],
+                [1,0,1,1,1,1,1,0,1,1,1,0,1,0,1],
+                [1,0,0,0,0,0,0,0,0,0,1,0,1,0,1],
+                [1,1,1,1,0,1,1,1,1,0,1,0,1,0,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,3,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+            ]
+        ];
+
+        // Dragon configurations for each level with distinct colors
+        const dragonConfigs = [
+            // Level 1: 1 dragon, horizontal movement
+            [{ startX: 5, startY: 1, path: [{ x: 5, y: 1 }, { x: 8, y: 1 }], speed: 0.05, char: '🐉', color: '#ff0000' }], // Red Dragon
+            // Level 2: 2 dragons, horizontal and vertical
+            [
+                { startX: 4, startY: 3, path: [{ x: 4, y: 3 }, { x: 8, y: 3 }], speed: 0.05, char: '🐉', color: '#00ff00' }, // Green Dragon
+                { startX: 10, startY: 5, path: [{ x: 10, y: 5 }, { x: 10, y: 7 }], speed: 0.05, char: '🐉', color: '#00ffff' }  // Cyan Dragon
+            ],
+            // Level 3: 3 dragons, more varied paths
+            [
+                { startX: 3, startY: 1, path: [{ x: 3, y: 1 }, { x: 7, y: 1 }], speed: 0.06, char: '🐉', color: '#ff00ff' }, // Magenta Dragon
+                { startX: 12, startY: 3, path: [{ x: 12, y: 3 }, { x: 8, y: 3 }], speed: 0.06, char: '🐉', color: '#ffcc00' }, // Orange Dragon
+                { startX: 5, startY: 5, path: [{ x: 5, y: 5 }, { x: 5, y: 7 }], speed: 0.06, char: '🐉', color: '#8000ff' }  // Purple Dragon
+            ],
+            // Level 4: 3 dragons, faster
+            [
+                { startX: 5, startY: 3, path: [{ x: 5, y: 3 }, { x: 9, y: 3 }], speed: 0.07, char: '🐉', color: '#0080ff' }, // Blue Dragon
+                { startX: 10, startY: 5, path: [{ x: 10, y: 5 }, { x: 6, y: 5 }], speed: 0.07, char: '🐉', color: '#ff6666' }, // Light Red Dragon
+                { startX: 12, startY: 7, path: [{ x: 12, y: 7 }, { x: 12, y: 1 }], speed: 0.07, char: '🐉', color: '#00ff80' }  // Spring Green Dragon
+            ],
+            // Level 5: 4 dragons, even faster, complex paths
+            [
+                { startX: 4, startY: 1, path: [{ x: 4, y: 1 }, { x: 7, y: 1 }], speed: 0.08, char: '🐉', color: '#ffffff' }, // White Dragon
+                { startX: 8, startY: 3, path: [{ x: 8, y: 3 }, { x: 11, y: 3 }], speed: 0.08, char: '🐉', color: '#ffff00' }, // Yellow Dragon
+                { startX: 5, startY: 5, path: [{ x: 5, y: 5 }, { x: 9, y: 5 }], speed: 0.08, char: '🐉', color: '#00f0ff' }, // Original Blue Dragon
+                { startX: 10, startY: 7, path: [{ x: 10, y: 7 }, { x: 3, y: 7 }], speed: 0.08, char: '🐉', color: '#ff00ff' }  // Original Pink Dragon
+            ]
+        ];
+
+        let currentMaze;
+        let dragons;
+
+        // Fireworks variables
+        const fireworks = [];
+        const maxFireworks = 50;
+
+        function initGame() {
+            score = 0;
+            currentLevel = 1;
+            lives = 3; // Reset lives
+            gameOver = false;
+            gameRunning = true;
+            messagesDisplay.style.display = 'none';
+            restartButton.style.display = 'none';
+            loadLevel(currentLevel);
+            updateGameInfo();
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            gameLoop();
+        }
+
+        function loadLevel(levelNum) {
+            currentMaze = JSON.parse(JSON.stringify(mazes[levelNum - 1])); // Deep copy maze
+            const config = dragonConfigs[levelNum - 1];
+            dragons = config.map(d => ({
+                x: d.startX,
+                y: d.startY,
+                path: d.path,
+                pathIndex: 0,
+                direction: 1, // 1 for forward, -1 for backward
+                speed: d.speed,
+                char: d.char,
+                color: d.color // Assign color
+            }));
+
+            // Find start and end points in the maze
+            for (let r = 0; r < currentMaze.length; r++) {
+                for (let c = 0; c < currentMaze[r].length; c++) {
+                    if (currentMaze[r][c] === 2) {
+                        player.x = c;
+                        player.y = r;
+                        startPoint.x = c; // Store start point
+                        startPoint.y = r; // Store start point
+                        currentMaze[r][c] = 0; // Convert start point to path
+                    } else if (currentMaze[r][c] === 3) {
+                        exit.x = c;
+                        exit.y = r;
+                        currentMaze[r][c] = 0; // Convert end point to path
+                    }
+                }
+            }
+        }
+
+        function updateGameInfo() {
+            scoreDisplay.textContent = `Score: ${score}`;
+            levelDisplay.textContent = `Level: ${currentLevel}`;
+            livesDisplay.textContent = `Lives: ${lives}`; // Update lives display
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Get current wall color based on level
+            const currentWallColor = wallColors[(currentLevel - 1) % wallColors.length];
+
+            // Draw maze
+            for (let r = 0; r < currentMaze.length; r++) {
+                for (let c = 0; c < currentMaze[r].length; c++) {
+                    if (currentMaze[r][c] === 1) { // Wall
+                        ctx.fillStyle = currentWallColor; /* Neon wall color based on level */
+                        ctx.fillRect(c * tileSize, r * tileSize, tileSize, tileSize);
+                        ctx.strokeStyle = '#ff00ff'; /* Neon pink outline */
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(c * tileSize, r * tileSize, tileSize, tileSize);
+                    }
+                }
+            }
+
+            // Draw start point
+            ctx.fillStyle = '#00ff00'; // Green start
+            ctx.globalAlpha = 0.5;
+            ctx.fillRect(startPoint.x * tileSize, startPoint.y * tileSize, tileSize, tileSize); // Mark actual start point
+            ctx.globalAlpha = 1;
+
+            // Draw exit point
+            ctx.fillStyle = '#ff00ff'; // Neon pink exit
+            ctx.globalAlpha = 0.5;
+            ctx.fillRect(exit.x * tileSize, exit.y * tileSize, tileSize, tileSize);
+            ctx.globalAlpha = 1;
+
+            // Draw player
+            ctx.font = `${tileSize * 0.8}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(player.character, player.x * tileSize + tileSize / 2, player.y * tileSize + tileSize / 2);
+
+            // Draw dragons
+            dragons.forEach(dragon => {
+                ctx.fillStyle = dragon.color; // Set dragon color
+                ctx.fillText(dragon.char, dragon.x * tileSize + tileSize / 2, dragon.y * tileSize + tileSize / 2);
+                ctx.fillStyle = '#00f0ff'; // Reset fillStyle for other elements
+            });
+            drawFireworks();
+        }
+
+        function update() {
+            if (!gameRunning || gameOver) return;
+
+            // Update dragon positions
+            dragons.forEach(dragon => {
+                const target = dragon.path[dragon.pathIndex];
+                const dx = target.x - dragon.x;
+                const dy = target.y - dragon.y;
+
+                if (Math.abs(dx) < dragon.speed && Math.abs(dy) < dragon.speed) {
+                    // Reached current target, move to next point in path
+                    dragon.pathIndex += dragon.direction;
+                    if (dragon.pathIndex >= dragon.path.length || dragon.pathIndex < 0) {
+                        dragon.direction *= -1; // Reverse direction
+                        dragon.pathIndex += dragon.direction * 2; // Adjust index to stay within bounds
+                    }
+                } else {
+                    // Move towards target
+                    if (dx !== 0) dragon.x += Math.sign(dx) * dragon.speed;
+                    if (dy !== 0) dragon.y += Math.sign(dy) * dragon.speed;
+                }
+            });
+
+            checkCollisions();
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        function handleKeyPress(event) {
+            if (!gameRunning || gameOver) return;
+
+            let newPlayerX = player.x;
+            let newPlayerY = player.y;
+
+            switch (event.key) {
+                case 'ArrowUp':
+                    newPlayerY--;
+                    break;
+                case 'ArrowDown':
+                    newPlayerY++;
+                    break;
+                case 'ArrowLeft':
+                    newPlayerX--;
+                    break;
+                case 'ArrowRight':
+                    newPlayerX++;
+                    break;
+            }
+
+            // Check if new position is within bounds and not a wall
+            if (newPlayerX >= 0 && newPlayerX < mazeWidth &&
+                newPlayerY >= 0 && newPlayerY < mazeHeight &&
+                currentMaze[newPlayerY][newPlayerX] !== 1) {
+                player.x = newPlayerX;
+                player.y = newPlayerY;
+            }
+        }
+
+        function checkCollisions() {
+            // Check player-dragon collision
+            dragons.forEach(dragon => {
+                const dragonCellX = Math.round(dragon.x);
+                const dragonCellY = Math.round(dragon.y);
+
+                if (player.x === dragonCellX && player.y === dragonCellY) {
+                    loseLife(); // Player hit a dragon
+                }
+            });
+
+            // Check player-exit collision
+            if (player.x === exit.x && player.y === exit.y) {
+                score += 100 * currentLevel; // Score based on level
+                if (currentLevel < mazes.length) {
+                    currentLevel++;
+                    nextLevel();
+                } else {
+                    endGame(true); // All levels completed
+                }
+            }
+        }
+
+        function loseLife() {
+            lives--;
+            updateGameInfo();
+            if (lives > 0) {
+                messagesDisplay.textContent = `Lost a life! ${lives} lives remaining.`;
+                messagesDisplay.style.display = 'block';
+                gameRunning = false; // Pause game
+                setTimeout(() => {
+                    player.x = startPoint.x; // Reset player position
+                    player.y = startPoint.y;
+                    messagesDisplay.style.display = 'none';
+                    gameRunning = true; // Resume game
+                }, 1500);
+            } else {
+                endGame(false); // No lives left
+            }
+        }
+
+        function nextLevel() {
+            gameRunning = false; // Pause game temporarily
+            messagesDisplay.textContent = `Level ${currentLevel - 1} Complete! Get Ready for Level ${currentLevel}!`;
+            messagesDisplay.style.display = 'block';
+            updateGameInfo();
+            setTimeout(() => {
+                messagesDisplay.style.display = 'none';
+                loadLevel(currentLevel);
+                gameRunning = true;
+            }, 2000); // 2 second pause before next level
+        }
+
+        function endGame(win) {
+            gameOver = true;
+            gameRunning = false;
+            cancelAnimationFrame(animationFrameId); // Stop game loop
+
+            if (win) {
+                messagesDisplay.textContent = `Congratulations! You cleared all ${mazes.length} mazes! Total Score: ${score}`;
+                messagesDisplay.style.display = 'block';
+                restartButton.textContent = 'Play Again';
+                restartButton.style.display = 'block';
+                celebrateFireworks();
+            } else {
+                messagesDisplay.textContent = `Game Over! You were caught by a dragon. Score: ${score}`;
+                messagesDisplay.style.display = 'block';
+                restartButton.textContent = 'Try Again';
+                restartButton.style.display = 'block';
+            }
+        }
+
+        // Fireworks functions
+        function createFireworkParticle(x, y, color) {
+            return {
+                x: x,
+                y: y,
+                vx: (Math.random() - 0.5) * 10, // Increased velocity for wider spread
+                vy: (Math.random() - 0.5) * 10, // Increased velocity for wider spread
+                life: 90, // Longer life for particles
+                color: color,
+                size: Math.random() * 4 + 2 // Random size for variation
+            };
+        }
+
+        function celebrateFireworks() {
+            fireworks.length = 0; // Clear existing fireworks
+            const colors = [
+                '#ff00ff', '#00f0ff', '#f0ff00', '#ff8000', '#00ff80',
+                '#8000ff', '#00ffc0', '#ffcc00'
+            ]; // More neon colors
+            const numBursts = 8; // Number of distinct bursts
+            const sparksPerBurst = 80; // More sparks per burst
+            let burstCount = 0;
+
+            const fireworkInterval = setInterval(() => {
+                if (burstCount >= numBursts) {
+                    clearInterval(fireworkInterval);
+                    return;
+                }
+
+                // Create bursts at different, random locations
+                const randomX = Math.random() * canvas.width;
+                const randomY = Math.random() * canvas.height;
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+                for (let i = 0; i < sparksPerBurst; i++) {
+                    fireworks.push(createFireworkParticle(randomX, randomY, randomColor));
+                }
+                burstCount++;
+            }, 200); // Interval between bursts
+
+            // Clear fireworks after a while to prevent overflow
+            setTimeout(() => {
+                clearInterval(fireworkInterval);
+                fireworks.length = 0;
+            }, 6000); // Total duration of fireworks display
+        }
+
+        function drawFireworks() {
+            for (let i = fireworks.length - 1; i >= 0; i--) {
+                const p = fireworks[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.1; // Gravity
+
+                // Simulate air resistance / deceleration
+                p.vx *= 0.98;
+                p.vy *= 0.98;
+
+                p.life--;
+
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.life / 90; // Fade out based on longer life
+                ctx.fillRect(p.x, p.y, p.size, p.size); // Use particle size
+                ctx.globalAlpha = 1;
+
+                if (p.life <= 0) {
+                    fireworks.splice(i, 1);
+                }
+            }
+        }
+
+
+        // Event Listeners
+        window.addEventListener('keydown', handleKeyPress);
+        restartButton.addEventListener('click', initGame);
+        window.onload = function() {
+            initGame(); // Start the game when the window loads
+        }
+
+        // Add touch controls for mobile responsiveness
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        canvas.addEventListener('touchstart', (e) => {
+            if (!gameRunning || gameOver) return;
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            e.preventDefault(); // Prevent scrolling
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', (e) => {
+            if (!gameRunning || gameOver) return;
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+
+            const dx = touchEndX - touchStartX;
+            const dy = touchEndY - touchStartY;
+
+            const threshold = 20; // Minimum swipe distance
+
+            if (Math.abs(dx) > Math.abs(dy)) { // Horizontal swipe
+                if (dx > threshold) {
+                    handleKeyPress({ key: 'ArrowRight' });
+                } else if (dx < -threshold) {
+                    handleKeyPress({ key: 'ArrowLeft' });
+                }
+            } else { // Vertical swipe
+                if (dy > threshold) {
+                    handleKeyPress({ key: 'ArrowDown' });
+                } else if (dy < -threshold) {
+                    handleKeyPress({ key: 'ArrowUp' });
+                }
+            }
+            e.preventDefault(); // Prevent scrolling
+        }, { passive: false });
+    </script>
+</body>
+</html>

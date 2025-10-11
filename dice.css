@@ -1,0 +1,102 @@
+body {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1606326608690-9b3d5b9a5e97?auto=format&fit=crop&w=1400&q=80');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    margin: 0;
+    color: #fff;
+    font-family: 'MedievalSharp', cursive;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    padding: 2rem 1rem 0;
+}
+
+h1 {
+    font-size: 4rem;
+    color: #ffd700;
+    text-shadow: 0 0 7px #ffd700, 0 0 10px #ffd700, 0 0 21px #ffd700, 0 0 42px #ffea00;
+    margin: 0;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 2rem 3rem;
+}
+
+p {
+    font-size: 1.5rem;
+    color: #0ff;
+    text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 15px #0ff;
+    max-width: 700px;
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 1000px;
+    margin: 2rem auto;
+}
+
+figure {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(255, 215, 0, 0.6);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+figcaption {
+    margin-top: 0.75rem;
+    font-size: 1rem;
+    color: #f8f8ff;
+}
+
+.return {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #0ff;
+    border-radius: 999px;
+    color: #0ff;
+    font-size: 1.2rem;
+    text-decoration: none;
+    text-shadow: 0 0 5px #0ff, 0 0 10px #0ff;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.return:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.7);
+}
+
+@media (max-width: 600px) {
+    h1 {
+        font-size: 3rem;
+    }
+
+    p {
+        font-size: 1.2rem;
+    }
+
+    img {
+        height: 180px;
+    }
+}

@@ -14,6 +14,10 @@ body {
 
 header {
     padding: 2rem 1rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
 }
 
 h1 {
@@ -21,6 +25,17 @@ h1 {
     color: #ffd700;
     text-shadow: 0 0 7px #ffd700, 0 0 10px #ffd700, 0 0 21px #ffd700, 0 0 42px #ffea00;
     margin: 0;
+}
+
+.header-dice {
+    display: flex;
+    align-items: center;
+}
+
+.dice-icon {
+    width: 90px;
+    height: 90px;
+    filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.5));
 }
 
 main {
@@ -47,7 +62,7 @@ p {
     margin: 2rem auto;
 }
 
-figure {
+.dice-card {
     background: rgba(0, 0, 0, 0.6);
     border: 2px solid rgba(255, 215, 0, 0.6);
     border-radius: 12px;
@@ -55,17 +70,52 @@ figure {
     box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
 }
 
-img {
+.image-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.image-wrapper img {
     width: 100%;
     height: 200px;
     object-fit: cover;
-    border-radius: 8px;
+    border-radius: 10px;
 }
 
 figcaption {
     margin-top: 0.75rem;
     font-size: 1rem;
     color: #f8f8ff;
+}
+
+.corner-dice {
+    position: absolute;
+    width: 72px;
+    height: 72px;
+    opacity: 0.8;
+    transform: rotate(-10deg);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.corner-dice.top-left {
+    top: -20px;
+    left: -20px;
+}
+
+.corner-dice.bottom-right {
+    bottom: -20px;
+    right: -20px;
+    transform: rotate(15deg);
+}
+
+.dice-card:hover .corner-dice {
+    opacity: 1;
+    transform: rotate(0deg) scale(1.05);
+}
+
+.dice-card:hover .corner-dice.bottom-right {
+    transform: rotate(0deg) scale(1.05);
 }
 
 .return {
@@ -96,7 +146,17 @@ figcaption {
         font-size: 1.2rem;
     }
 
-    img {
+    .dice-icon {
+        width: 70px;
+        height: 70px;
+    }
+
+    .image-wrapper img {
         height: 180px;
+    }
+
+    .corner-dice {
+        width: 60px;
+        height: 60px;
     }
 }

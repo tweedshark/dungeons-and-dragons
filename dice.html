@@ -8,25 +8,99 @@
 </head>
 <body>
     <header>
+        <div class="header-dice" aria-hidden="true">
+            <svg class="dice-icon" viewBox="0 0 120 120" role="img">
+                <polygon points="60,8 112,40 112,80 60,112 8,80 8,40" fill="#2b1055" stroke="#ffd700" stroke-width="4"></polygon>
+                <polygon points="60,8 112,40 60,64 8,40" fill="#7b2cbf" opacity="0.85"></polygon>
+                <polygon points="60,64 112,80 60,112 8,80" fill="#3a0ca3" opacity="0.85"></polygon>
+                <polygon points="60,8 112,40 60,64" fill="#9d4edd" opacity="0.55"></polygon>
+                <polygon points="60,64 112,80 60,112" fill="#5a189a" opacity="0.65"></polygon>
+                <text x="60" y="78" text-anchor="middle" font-size="42" fill="#ffd700" font-family="'Cinzel', serif">20</text>
+            </svg>
+        </div>
         <h1>Dice Gallery</h1>
+        <div class="header-dice" aria-hidden="true">
+            <svg class="dice-icon" viewBox="0 0 120 120" role="img">
+                <polygon points="60,8 112,40 112,80 60,112 8,80 8,40" fill="#2b1055" stroke="#ffd700" stroke-width="4"></polygon>
+                <polygon points="60,8 112,40 60,64 8,40" fill="#7b2cbf" opacity="0.85"></polygon>
+                <polygon points="60,64 112,80 60,112 8,80" fill="#3a0ca3" opacity="0.85"></polygon>
+                <polygon points="60,8 112,40 60,64" fill="#9d4edd" opacity="0.55"></polygon>
+                <polygon points="60,64 112,80 60,112" fill="#5a189a" opacity="0.65"></polygon>
+                <text x="60" y="78" text-anchor="middle" font-size="42" fill="#ffd700" font-family="'Cinzel', serif">20</text>
+            </svg>
+        </div>
     </header>
     <main>
         <p>Explore the colorful dice that bring Dungeons & Dragons adventures to life.</p>
         <section class="gallery">
-            <figure>
-                <img src="https://images.unsplash.com/photo-1596496055451-9c76df4687c9?auto=format&fit=crop&w=800&q=80" alt="Set of multicolored polyhedral dice on a table">
+            <figure class="dice-card">
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1596496055451-9c76df4687c9?auto=format&fit=crop&w=800&q=80" alt="Set of multicolored polyhedral dice on a table">
+                    <svg class="corner-dice top-left" viewBox="0 0 120 120" aria-hidden="true">
+                        <polygon points="60,8 112,40 112,80 60,112 8,80 8,40" fill="#1b263b" stroke="#0ff" stroke-width="6"></polygon>
+                        <circle cx="60" cy="60" r="24" fill="none" stroke="#ffd700" stroke-width="6"></circle>
+                        <text x="60" y="74" text-anchor="middle" font-size="36" fill="#ffd700" font-family="'Cinzel', serif">D8</text>
+                    </svg>
+                    <svg class="corner-dice bottom-right" viewBox="0 0 120 120" aria-hidden="true">
+                        <polygon points="60,8 112,40 112,80 60,112 8,80 8,40" fill="#1b263b" stroke="#0ff" stroke-width="6"></polygon>
+                        <circle cx="60" cy="60" r="24" fill="none" stroke="#ffd700" stroke-width="6"></circle>
+                        <text x="60" y="74" text-anchor="middle" font-size="36" fill="#ffd700" font-family="'Cinzel', serif">D8</text>
+                    </svg>
+                </div>
                 <figcaption>Classic polyhedral set ready for a campaign.</figcaption>
             </figure>
-            <figure>
-                <img src="https://images.unsplash.com/photo-1607344645866-009c320b47cd?auto=format&fit=crop&w=800&q=80" alt="Close-up of a d20 die glowing with purple light">
+            <figure class="dice-card">
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1607344645866-009c320b47cd?auto=format&fit=crop&w=800&q=80" alt="Close-up of a d20 die glowing with purple light">
+                    <svg class="corner-dice top-left" viewBox="0 0 120 120" aria-hidden="true">
+                        <polygon points="60,8 112,40 112,80 60,112 8,80 8,40" fill="#102a43" stroke="#ff4b8b" stroke-width="6"></polygon>
+                        <polygon points="60,18 100,42 100,78 60,102 20,78 20,42" fill="#1f4068" opacity="0.9"></polygon>
+                        <text x="60" y="78" text-anchor="middle" font-size="38" fill="#ff4b8b" font-family="'Cinzel', serif">D20</text>
+                    </svg>
+                    <svg class="corner-dice bottom-right" viewBox="0 0 120 120" aria-hidden="true">
+                        <polygon points="60,8 112,40 112,80 60,112 8,80 8,40" fill="#102a43" stroke="#ff4b8b" stroke-width="6"></polygon>
+                        <polygon points="60,18 100,42 100,78 60,102 20,78 20,42" fill="#1f4068" opacity="0.9"></polygon>
+                        <text x="60" y="78" text-anchor="middle" font-size="38" fill="#ff4b8b" font-family="'Cinzel', serif">D20</text>
+                    </svg>
+                </div>
                 <figcaption>Critical hits captured in a dramatic d20 close-up.</figcaption>
             </figure>
-            <figure>
-                <img src="https://images.unsplash.com/photo-1611421560497-964608cda103?auto=format&fit=crop&w=800&q=80" alt="Metallic dice set in a leather pouch">
+            <figure class="dice-card">
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1611421560497-964608cda103?auto=format&fit=crop&w=800&q=80" alt="Metallic dice set in a leather pouch">
+                    <svg class="corner-dice top-left" viewBox="0 0 120 120" aria-hidden="true">
+                        <polygon points="60,8 112,40 112,80 60,112 8,80 8,40" fill="#2b2d42" stroke="#ffd166" stroke-width="6"></polygon>
+                        <polygon points="60,12 106,40 60,68 14,40" fill="#8d99ae" opacity="0.85"></polygon>
+                        <polygon points="60,68 106,96 60,108 14,96" fill="#495057" opacity="0.85"></polygon>
+                        <text x="60" y="78" text-anchor="middle" font-size="34" fill="#ffd166" font-family="'Cinzel', serif">D12</text>
+                    </svg>
+                    <svg class="corner-dice bottom-right" viewBox="0 0 120 120" aria-hidden="true">
+                        <polygon points="60,8 112,40 112,80 60,112 8,80 8,40" fill="#2b2d42" stroke="#ffd166" stroke-width="6"></polygon>
+                        <polygon points="60,12 106,40 60,68 14,40" fill="#8d99ae" opacity="0.85"></polygon>
+                        <polygon points="60,68 106,96 60,108 14,96" fill="#495057" opacity="0.85"></polygon>
+                        <text x="60" y="78" text-anchor="middle" font-size="34" fill="#ffd166" font-family="'Cinzel', serif">D12</text>
+                    </svg>
+                </div>
                 <figcaption>Metal dice waiting to weigh in on fate.</figcaption>
             </figure>
-            <figure>
-                <img src="https://images.unsplash.com/photo-1585831308481-1678d2668421?auto=format&fit=crop&w=800&q=80" alt="Hand tossing a collection of dice onto a rulebook">
+            <figure class="dice-card">
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1585831308481-1678d2668421?auto=format&fit=crop&w=800&q=80" alt="Hand tossing a collection of dice onto a rulebook">
+                    <svg class="corner-dice top-left" viewBox="0 0 120 120" aria-hidden="true">
+                        <polygon points="60,8 112,40 112,80 60,112 8,80 8,40" fill="#1b4332" stroke="#80ed99" stroke-width="6"></polygon>
+                        <rect x="34" y="34" width="52" height="52" rx="10" fill="#081c15" stroke="#80ed99" stroke-width="6"></rect>
+                        <circle cx="46" cy="46" r="6" fill="#80ed99"></circle>
+                        <circle cx="60" cy="60" r="6" fill="#80ed99"></circle>
+                        <circle cx="74" cy="74" r="6" fill="#80ed99"></circle>
+                    </svg>
+                    <svg class="corner-dice bottom-right" viewBox="0 0 120 120" aria-hidden="true">
+                        <polygon points="60,8 112,40 112,80 60,112 8,80 8,40" fill="#1b4332" stroke="#80ed99" stroke-width="6"></polygon>
+                        <rect x="34" y="34" width="52" height="52" rx="10" fill="#081c15" stroke="#80ed99" stroke-width="6"></rect>
+                        <circle cx="46" cy="46" r="6" fill="#80ed99"></circle>
+                        <circle cx="60" cy="60" r="6" fill="#80ed99"></circle>
+                        <circle cx="74" cy="74" r="6" fill="#80ed99"></circle>
+                    </svg>
+                </div>
                 <figcaption>Moments before the throw that changes the story.</figcaption>
             </figure>
         </section>

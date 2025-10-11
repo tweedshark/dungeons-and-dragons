@@ -15,8 +15,8 @@ body {
 
 h1 {
     font-size: 5rem; /* Increased size for impact */
-    color: #f0f;
-    text-shadow: 0 0 7px #f0f, 0 0 10px #f0f, 0 0 21px #f0f, 0 0 42px #f0f, 0 0 82px #f0f, 0 0 92px #f0f;
+    color: #ffd700;
+    text-shadow: 0 0 7px #ffd700, 0 0 10px #ffd700, 0 0 21px #ffd700, 0 0 42px #ffea00, 0 0 82px #ffea00, 0 0 92px #fff176;
 }
 
 p {
